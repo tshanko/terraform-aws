@@ -5,21 +5,21 @@ module "s3_bucket" {
   force_destroy = true
 }
 
-#data "aws_iam_policy_document" "s3_policy" {
-#   version = "2022-06-20"
-#
-#   statement {
-#      actions    = ["s3:GetObject"]
-#      resources  = ["${module.s3_bucket.s3_bucket_arn}/*"]
-#
-#      principals {
-#	type     = "AWS"
-#	identifiers = module.cdn.cloudfront_origin_access_identity_iam_arns
-#   } 
-# }
-# }
+data "aws_iam_policy_document" "s3_policy" {
+   version = "2022-06-25"
 
-# resource "aws_s3_bucket_policy" "docs" {
-#   bucket = module.s3_bucket.s3_bucket_id
-#   policy = data.aws_iam_policy_document.s3_policy.json
-# }
+   statement {
+      actions    = ["s3:GetObject"]
+      resources  = ["${module.s3_bucket.s3_bucket_arn}/*"]
+
+      principals {
+	type     = "AWS"
+	identifiers = module.cloudfront_origin_access_identity_iam_arns
+   } 
+ }
+}
+
+resource "aws_s3_bucket_policy" "docs" {
+   bucket = module.s3_bucket.s3_bucket_id
+   policy = data.aws_iam_policy_document.s3_policy.json
+}

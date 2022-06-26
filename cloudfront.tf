@@ -1,7 +1,7 @@
 module "cloudfront" {
   source    = "terraform-aws-modules/cloudfront/aws"
  
-  aliases   = ["cdn.example.com"]
+  aliases   = ["www.${var.domain_name}"]
 
   version   = "2.9.3"
   comment   = "Create Cloudfront"
@@ -39,6 +39,16 @@ default_cache_behavior =  {
    allowed_methods  = ["GET","HEAD"]
    cached_methods   = ["GET","HEAD"]
 }
+viewer_certificate = {
+    acm_certificate_arn = aws_acm_certificate_validation.cert_validation.certificate_arn
+    ssl_support_method = "sni-only"
+    minimum_protocol_version = "TLSv1.1_2016"
+  }
+
 
 default_root_object = "index.html"
+
+custom_error_response = {
+  error_code = 404.html
+ }
 }
