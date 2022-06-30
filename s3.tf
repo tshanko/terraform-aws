@@ -6,7 +6,7 @@ module "s3_bucket" {
 }
 
 data "aws_iam_policy_document" "s3_policy" {
-   version = "2022-06-25"
+   version = "2012-10-17"
 
    statement {
       actions    = ["s3:GetObject"]
@@ -14,12 +14,25 @@ data "aws_iam_policy_document" "s3_policy" {
 
       principals {
 	type     = "AWS"
-	identifiers = module.cloudfront_origin_access_identity_iam_arns
+	identifiers = module.cloudfront.cloudfront_origin_access_identity_iam_arns
    } 
  }
 }
 
-resource "aws_s3_bucket_policy" "docs" {
+resource "aws_s3_bucket_policy" "bucket_policy" {
    bucket = module.s3_bucket.s3_bucket_id
    policy = data.aws_iam_policy_document.s3_policy.json
+}
+
+resource "aws_s3_bucket" "my_static_website" {
+   bucket = module.s3_bucket.s3_bucket_id
+   acl    = "private"
+
+   website  {
+     index_document = "index.html"
+ }
+}
+
+output "website_endpoint" {
+  value = aws_s3_bucket.my_static_website.website_endpoint
 }

@@ -13,21 +13,25 @@ module "cloudfront" {
 
 
 
-create_origin_access_identity = true
 origin_access_identities = {
-  static-website-deploy = "Amazon s3 bucket"
+  bucket_s3 = "Cloudfront Access"
 }
 
 
 origin = {
-  bucket_s3 = {
-    domain_name = "static_website_deploy_domain_name"
+  custom_origin_config = {
+        http_port              = 80
+        https_port             = 443
+        origin_ssl_protocols   = ["TLSv1", "TLSv1.1", "TLSv1.2"]
+ }
+
+  s3_bucket = {
      s3_origin_config = {
-	origin_access_identity = "static-website-deploy"
+	origin_access_identity = "bucket_s3"
         origin_ssl_protocols   = ["TLSv1", "TLSv1.1", "TLSv1.2"]
    }
   }
- }
+}
 default_cache_behavior =  {
    target_origin_id 	= "bucket_s3"
    viewer_protocol_policy = "redirect-to-https"
@@ -40,15 +44,11 @@ default_cache_behavior =  {
    cached_methods   = ["GET","HEAD"]
 }
 viewer_certificate = {
-    acm_certificate_arn = aws_acm_certificate_validation.cert_validation.certificate_arn
-    ssl_support_method = "sni-only"
-    minimum_protocol_version = "TLSv1.1_2016"
+  "cloudfront_default_certificate": true,
+  "minimum_protocol_version": "TLSv1"
   }
 
 
 default_root_object = "index.html"
 
-custom_error_response = {
-  error_code = 404.html
- }
 }
