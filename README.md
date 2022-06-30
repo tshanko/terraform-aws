@@ -1,0 +1,1 @@
+Uploaded config files I worked on, Successfully created s3 bucket but having trouble with cloudfront creation and integration with s3 bucket. I didn't include the variable.tf file as it includes my access_id and secret_id to connect to my aws account
