@@ -10,8 +10,7 @@ data "aws_iam_policy_document" "s3_policy" {
 
    statement {
       actions    = ["s3:GetObject"]
-      resources  = ["${module.s3_bucket.s3_bucket_arn}/*"]
-
+      resources  = ["${module.s3_bucket.s3_bucket_arn}/*"]#
       principals {
 	type     = "AWS"
 	identifiers = module.cloudfront.cloudfront_origin_access_identity_iam_arns
@@ -24,15 +23,11 @@ resource "aws_s3_bucket_policy" "bucket_policy" {
    policy = data.aws_iam_policy_document.s3_policy.json
 }
 
-resource "aws_s3_bucket" "my_static_website" {
+resource "aws_s3_bucket_object" "my_static_website" {
    bucket = module.s3_bucket.s3_bucket_id
    acl    = "private"
-
-   website  {
-     index_document = "index.html"
+   key    = "index_file"
+   source = "./myfiles/index.html"
+   etag = filemd5("./myfiles/index.html")
  }
-}
 
-output "website_endpoint" {
-  value = aws_s3_bucket.my_static_website.website_endpoint
-}
